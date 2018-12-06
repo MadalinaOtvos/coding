@@ -22,6 +22,6 @@ public class BikeServiceImpl implements BikeService {
 
     @Override
     public List<Bike> findAvailableBikes() {
-        return bikeRepository.findRentedFalse();
+        return bikeRepository.findByRentedFalse();
     }
 }

@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface BikeRepository extends JpaRepository<Bike,Long> {
-    List<Bike> findRentedFalse();
+    List<Bike> findByRentedFalse();
 }
