@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "BikeRental")
+@Table(name = "bikes")
 public class Bike implements Serializable {
 
 
@@ -15,8 +15,7 @@ public class Bike implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
-    @Column(name = "Name", nullable = false)
+    @Column(name = "Name")
     private String name;
 
     @NotEmpty
@@ -42,8 +41,7 @@ public class Bike implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
 
         Bike bike = (Bike) o;
-        if (id != null ? !id.equals(bike.id) : bike.id != null) return false;
-        return (name != null) ? !name.equals(bike.name): (bike.name != null);
+        return id != null ? !id.equals(bike.id) : bike.id != null;
     }
 
     /**

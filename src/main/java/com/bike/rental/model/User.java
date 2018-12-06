@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 /**
  * Definition of User entry fields. The object will be stored in Users database.
  */
@@ -42,8 +42,7 @@ public class User implements Serializable {
 
         User user = (User) o;
         if (id != null ? !id.equals(user.id) : user.id != null) return false;
-        return ((name != null && email != null)) ? !(name.equals(user.name) && email.equals(user.email))
-                : ((user.name != null) && (user.email != null));
+        return email != null ? !email.equals(user.email) : user.email != null;
     }
 
     /**
