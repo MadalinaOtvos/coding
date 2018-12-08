@@ -5,7 +5,7 @@
         <div class="panel-body">
 
                 &nbsp
-                <h2>Login</h2>
+                <h3>Login</h3>
                 &nbsp
                 <div ng-show="vm.error" class="alert alert-danger">{{vm.error}}</div>
                 <form name="form" ng-submit="vm.login()" role="form">

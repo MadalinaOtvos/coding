@@ -6,7 +6,7 @@
             <div class="col-md-4 col-md-offset-4">
 
                 &nbsp
-                <h2>Register</h2>
+                <h3>Register</h3>
                 <div ng-show="vm.error" class="alert alert-danger">{{vm.error}}</div>
                 <form name="form" ng-submit="vm.register()" role="form">
                     &nbsp
