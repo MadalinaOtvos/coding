@@ -1,14 +1,14 @@
 'use strict';
 
-angular.module('app').controller('userController',
-    ['userService', '$scope', function (userService, $scope) {
+angular.module('app').controller('LoginController',
+    ['LoginService', '$scope', function (LoginService, $scope) {
 
         var self = this;
 
         self.submit = submit;
         self.user = {};
         self.user.email = "";
-        self.user.surname = "";
+        self.user.username = "";
 
         function submit() {
 
