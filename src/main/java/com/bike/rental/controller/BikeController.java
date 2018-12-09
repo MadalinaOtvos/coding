@@ -42,7 +42,7 @@ public class BikeController {
      * Retrieve all available to rent, Bike entries from database.
      * @return list of available Bike entries
      */
-    @RequestMapping(value = "/available/", method = RequestMethod.GET)
+    @RequestMapping(value = "/bikes/available", method = RequestMethod.GET)
     public ResponseEntity<List<Bike>> listAvailableBikes() {
         List<Bike> bikes = bikeService.findAvailableBikes();
         if (bikes.isEmpty()) {
