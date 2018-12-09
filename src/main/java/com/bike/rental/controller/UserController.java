@@ -1,34 +1,42 @@
 package com.bike.rental.controller;
-
+import com.bike.rental.model.ApiResponse;
 import com.bike.rental.model.User;
 import com.bike.rental.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * User REST controller to expose the API endpoints for User CRUD actions.
- */
-@RequestMapping("/api")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@RequestMapping("/api/users")
 public class UserController {
+
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public List<User> listUser() {
-        return userService.findAll();
-    }
-
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public User create(@RequestBody User user) {
+    @RequestMapping(value="/register", method = RequestMethod.POST)
+    public User saveUser(@RequestBody User user){
         return userService.save(user);
     }
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
-    public String delete(@PathVariable(value = "id") Long id) {
-        userService.delete(id);
-        return "success";
+    @GetMapping
+    public ApiResponse<List<User>> getUsers(){
+        return new ApiResponse<>(HttpStatus.OK.value(), "User list fetched successfully.",userService.findAll());
     }
+
+    @GetMapping("/{id}")
+    public ApiResponse<User> getOne(@PathVariable Long id){
+        return new ApiResponse<>(HttpStatus.OK.value(), "User fetched successfully.",userService.findById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable Long id) {
+        userService.delete(id);
+        return new ApiResponse<>(HttpStatus.OK.value(), "User deleted successfully.", null);
+    }
+
+
+
 }
