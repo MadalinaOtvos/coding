@@ -4,8 +4,6 @@ server:
 
 datasource:
     url: jdbc:h2:~/BikeRental;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
-    username: bh
-    password: test
     driverClassName: org.h2.Driver
     maxPoolSize: 10
     hibernate:
