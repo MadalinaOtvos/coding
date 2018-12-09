@@ -1,5 +1,6 @@
 package com.bike.rental.controller;
 
+import com.bike.rental.model.ApiResponse;
 import com.bike.rental.model.Bike;
 import com.bike.rental.service.BikeService;
 import org.slf4j.Logger;
@@ -28,13 +29,13 @@ public class BikeController {
      * Retrieve all Bike entries from database.
      * @return list of Bike entries
      */
-    @RequestMapping(value = "/bikes/", method = RequestMethod.GET)
-    public ResponseEntity<List<Bike>> listAllBikes() {
+    @RequestMapping(value = "/bikes", method = RequestMethod.GET)
+    public ApiResponse<List<Bike>> listAllBikes() {
         List<Bike> bikes = bikeService.findAllBikes();
         if (bikes.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return  new ApiResponse<>(HttpStatus.NO_CONTENT.value(),"Bike objects list is empty.",bikes);
         }
-        return new ResponseEntity<List<Bike>>(bikes, HttpStatus.OK);
+        return new ApiResponse<>(HttpStatus.OK.value(),"Bike objects fetched successfully.",bikes);
     }
 
 
@@ -43,11 +44,11 @@ public class BikeController {
      * @return list of available Bike entries
      */
     @RequestMapping(value = "/bikes/available", method = RequestMethod.GET)
-    public ResponseEntity<List<Bike>> listAvailableBikes() {
+    public ApiResponse<List<Bike>> listAvailableBikes() {
         List<Bike> bikes = bikeService.findAvailableBikes();
         if (bikes.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+            return  new ApiResponse<>(HttpStatus.NO_CONTENT.value(),"Bike objects list is empty.",bikes);
         }
-        return new ResponseEntity<List<Bike>>(bikes, HttpStatus.OK);
+        return  new ApiResponse<>(HttpStatus.OK.value(),"Bike objects fetched successfully.",bikes);
     }
 }
