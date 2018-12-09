@@ -1,48 +1,64 @@
 package com.bike.rental.service;
 
-
 import com.bike.rental.model.User;
 import com.bike.rental.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-@Service("userService")
-@Transactional
-/**
- * User service with direct access to the user repository.
- * The naming convention is used to identify the action that the method executes.
- */
-public class UserServiceImpl implements UserService {
+@Service(value = "userService")
+public class UserServiceImpl implements UserDetailsService, UserService {
+	
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private BCryptPasswordEncoder bcryptEncoder;
 
-    public User findById(Long id) {
-        return userRepository.findOne(id);
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		User user = userRepository.findUserByEmail(email);
+		if(user == null){
+			throw new UsernameNotFoundException("Invalid username or password.");
+		}
+		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), getAuthority());
+	}
+
+	private List<SimpleGrantedAuthority> getAuthority() {
+		return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+	}
+
+	public List<User> findAll() {
+		List<User> list = new ArrayList<>();
+		userRepository.findAll().iterator().forEachRemaining(list::add);
+		return list;
+	}
+
+	@Override
+	public void delete(Long id) {
+		userRepository.deleteById(id);
+	}
+
+	@Override
+	public User findById(Long id) {
+		return userRepository.findById(id);
+	}
+
+	@Override
+	public User findByEmail(String email) {
+		return userRepository.findUserByEmail(email);
+	}
+
+	@Override
+	public User save(User user) {
+		user.setPassword(bcryptEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
-
-    public List<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
-
-    public void updateUser(User user) {
-        saveUser(user);
-    }
-
-    public void deleteUserById(Long id) {
-        userRepository.delete(id);
-    }
-
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
-    }
-
 }
-
