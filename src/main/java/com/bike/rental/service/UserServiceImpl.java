@@ -64,12 +64,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public User updateRentedBike(User user) {
-        User userObj = userRepository.findUserByEmail(user.getEmail());
-        if (userObj.getRentedBikeId() == 0L && user.getRentedBikeId() != 0L) {
-            return userRepository.updateRentedBike(userObj.getEmail(), user.getRentedBikeId());
-        } else {
-            return userObj;
-        }
+        userRepository.updateUserRentedBike(user.getEmail(), user.getRentedBikeId());
+        return userRepository.findUserByEmail(user.getEmail());
 
     }
 }

@@ -1,6 +1,5 @@
 package com.bike.rental.controller;
 
-import com.bike.rental.model.ApiResponse;
 import com.bike.rental.model.Bike;
 import com.bike.rental.model.User;
 import com.bike.rental.service.BikeService;
@@ -9,11 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -35,13 +37,13 @@ public class BikeController {
      *
      * @return list of Bike entries
      */
-    @RequestMapping(value = "/bikes/", method = RequestMethod.GET)
-    public ApiResponse<List<Bike>> listAllBikes() {
+    @RequestMapping(value = "/bikes", method = RequestMethod.GET)
+    public ResponseEntity<List<Bike>> listAllBikes() {
         List<Bike> bikes = bikeService.findAllBikes();
         if (bikes.isEmpty()) {
-            return new ApiResponse<>(HttpStatus.NO_CONTENT.value(), "Bike objects list is empty.", bikes);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
         }
-        return new ApiResponse<>(HttpStatus.OK.value(), "Bike objects fetched successfully.", bikes);
+        return new ResponseEntity<>(bikes, HttpStatus.OK);
     }
 
 
@@ -51,12 +53,13 @@ public class BikeController {
      * @return list of available Bike entries
      */
     @RequestMapping(value = "/bikes/available", method = RequestMethod.GET)
-    public ApiResponse<List<Bike>> listAvailableBikes() {
+    @ResponseBody
+    public ResponseEntity<List<Bike>> listAvailableBikes() {
         List<Bike> bikes = bikeService.findAvailableBikes();
         if (bikes.isEmpty()) {
-            return new ApiResponse<>(HttpStatus.NO_CONTENT.value(), "Bike objects list is empty.", bikes);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
         }
-        return new ApiResponse<>(HttpStatus.OK.value(), "Bike objects fetched successfully.", bikes);
+        return new ResponseEntity<>(bikes, HttpStatus.OK);
     }
 
     /**
@@ -65,14 +68,14 @@ public class BikeController {
      * @return Bike with rented=true, updated email
      */
     @RequestMapping(value = "/bikes/rent", method = RequestMethod.POST)
-    public ApiResponse<Bike> updateBike(@RequestBody User user) {
-        Bike bike = bikeService.findBikeById(user.getRentedBikeId());
-
-        if (bike.getRented() == true) {
-            return new ApiResponse<>(HttpStatus.CONFLICT.value(), "Bike is already rented!", bike);
+    public ResponseEntity<Bike> updateBike(@RequestBody User user) {
+        Bike bike = bikeService.updateRented(user.getRentedBikeId(), true, user.getName(), user.getEmail());
+        if (bike == null) {
+            return new ResponseEntity<>(bike, HttpStatus.CONFLICT);
         } else {
-            bikeService.updateRented(user.getRentedBikeId(), true, user.getName(), user.getEmail());
-            return new ApiResponse<>(HttpStatus.OK.value(), "Bike rented by user: " + user.getEmail(), bike);
+            User updatedUserBikeStatus = userService.updateRentedBike(user);
+            logger.info("Bike {} is rented by user {}", updatedUserBikeStatus.getId(), updatedUserBikeStatus.getEmail());
+            return new ResponseEntity<>(bike, HttpStatus.OK);
         }
     }
 
@@ -82,17 +85,17 @@ public class BikeController {
      * @return Bike with rented=false and updated email empty, name Bike and user's rentedBikeId = 0L
      */
     @RequestMapping(value = "/bikes/leave", method = RequestMethod.POST)
-    public ApiResponse<Bike> leaveBike(@RequestBody User user) {
+    public ResponseEntity<Bike> leaveBike(@RequestBody User user) {
         Bike bike = bikeService.findBikeById(user.getRentedBikeId());
-        Long idOfBike = user.getRentedBikeId();
 
-        if (bike.getRented() == null) {
-            return new ApiResponse<>(HttpStatus.CONFLICT.value(), "Bike doesn't exist!", null);
+        if (bike == null) {
+            return new ResponseEntity<>(bike, HttpStatus.CONFLICT);
         } else {
             bike = bikeService.updateRented(user.getRentedBikeId(), false, "Bike", "");
             user.setRentedBikeId(0L);
             userService.updateRentedBike(user);
-            return new ApiResponse<>(HttpStatus.OK.value(), String.format("Bike id %s left by user: %s.", idOfBike, user.getEmail()), bike);
+            logger.info("Bike id {} left by user: {}.", user.getRentedBikeId(), user.getEmail());
+            return new ResponseEntity<>(bike, HttpStatus.OK);
         }
     }
 }

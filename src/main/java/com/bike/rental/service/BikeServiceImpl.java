@@ -14,8 +14,6 @@ import java.util.List;
 public class BikeServiceImpl implements BikeService {
     @Autowired
     private BikeRepository bikeRepository;
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public List<Bike> findAllBikes() {
@@ -35,10 +33,11 @@ public class BikeServiceImpl implements BikeService {
     @Override
     public Bike updateRented(Long id, Boolean status, String name, String email) {
         Bike bike = bikeRepository.findBikeById(id);
-        bike.setRented(status);
-        bike.setName(name);
-        bike.setEmail(email);
-        bikeRepository.save(bike);
-        return bike;
+        if (bike != null) {
+            bikeRepository.updateRentedBike(id, status, name, email);
+            return bikeRepository.findBikeById(id);
+        } else {
+            return null;
+        }
     }
 }
