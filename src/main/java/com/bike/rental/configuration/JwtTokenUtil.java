@@ -1,8 +1,11 @@
 package com.bike.rental.configuration;
+
 import com.bike.rental.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -12,11 +15,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.function.Function;
 
-import static com.bike.rental.model.Constants.ACCESS_TOKEN_VALIDITY_SECONDS;
-import static com.bike.rental.model.Constants.SIGNING_KEY;
-
 @Component
 public class JwtTokenUtil implements Serializable {
+    @Autowired
+    private Environment environment;
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -33,7 +35,7 @@ public class JwtTokenUtil implements Serializable {
 
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(SIGNING_KEY)
+                .setSigningKey(environment.getRequiredProperty("SIGNING_KEY"))
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -55,16 +57,16 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS*1000))
-                .signWith(SignatureAlgorithm.HS256, SIGNING_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + environment.getRequiredProperty("ACCESS_TOKEN_VALIDITY_SECONDS")))
+                .signWith(SignatureAlgorithm.HS256, environment.getRequiredProperty("SIGNING_KEY"))
                 .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (
-              username.equals(userDetails.getUsername())
-                    && !isTokenExpired(token));
+                username.equals(userDetails.getUsername())
+                        && !isTokenExpired(token));
     }
 
 }
