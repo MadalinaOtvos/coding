@@ -35,6 +35,7 @@ public class Bike implements Serializable {
 
     /**
      * Equals function that compares if the bike id and bike name are equal in case of two object comparison.
+     *
      * @param o
      * @return
      */
@@ -44,11 +45,12 @@ public class Bike implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
 
         Bike bike = (Bike) o;
-        return id != null  ? !id.equals(bike.id) && email.equals(bike.email) : bike.id != null;
+        return id != null ? !id.equals(bike.id) && email.equals(bike.email) : bike.id != null;
     }
 
     /**
      * HashCode function for hashing algorithm of object uniqueness and consistency.
+     *
      * @return int code
      */
     @Override
@@ -73,12 +75,13 @@ public class Bike implements Serializable {
 
     /**
      * toString function for object String serialization.
+     *
      * @return String representation of Bike object
      */
     @Override
     public String toString() {
-        return "Bike [id=" + id + ", name=" + name + ", latitude= "
-                + latitude + ", longitude=" + longitude + ", rented=" + rented + "]";
+        return "Bike [id=" + id + ", name=" + name + ", latitude= " + ", email= " + email
+                + ", latitude=" + latitude + ", longitude=" + longitude + ", rented=" + rented + "]";
     }
 
     public void setId(Long id) {
