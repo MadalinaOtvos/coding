@@ -28,6 +28,8 @@ public class User implements Serializable {
     @Column(name = "Password")
     private String password;
 
+    @Column(name = "rentedBikeId")
+    private Long rentedBikeId;
 
     /**
      * Comparison of two User objects if the id is equal the object is the same, otherwise the name email pair are checked.
@@ -62,7 +64,7 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User [id=" + id + ", name=" + name + ", email= "
-                + email + "]";
+                + email + ", rentedBikeId=" + getRentedBikeId() + "]";
     }
 
 
@@ -96,6 +98,14 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getRentedBikeId() {
+        return rentedBikeId;
+    }
+
+    public void setRentedBikeId(Long rentedBikeId) {
+        this.rentedBikeId = rentedBikeId;
     }
 
 }

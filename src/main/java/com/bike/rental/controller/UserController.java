@@ -19,11 +19,12 @@ public class UserController {
     @RequestMapping(value="/register", method = RequestMethod.POST)
     public ApiResponse<User> saveUser(@RequestBody User user){
         User userObj = userService.findByEmail(user.getEmail());
-        if(userObj.getId()!= null){
-            return new ApiResponse<>(HttpStatus.CONFLICT.value(), String.format("User {} is already registered.",user.getEmail()) , userObj);
+        if(userObj != null){
+            return new ApiResponse<>(HttpStatus.CONFLICT.value(), String.format("User %s is already registered.",user.getEmail()) , userObj);
         }
+        user.setRentedBikeId(0L);
         userObj = userService.save(user);
-        return new ApiResponse<>(HttpStatus.OK.value(), "User list fetched successfully.",userObj);
+        return new ApiResponse<>(HttpStatus.OK.value(), "User is fetched successfully.",userObj);
     }
 
     @GetMapping

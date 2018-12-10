@@ -9,5 +9,7 @@ import java.util.List;
 public interface BikeService {
     List<Bike> findAllBikes();
     List<Bike> findAvailableBikes();
+    Bike findBikeById(Long id);
+    Bike updateRented(Long id, Boolean status, String name, String email);
 
 }

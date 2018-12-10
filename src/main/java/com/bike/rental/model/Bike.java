@@ -18,6 +18,9 @@ public class Bike implements Serializable {
     @Column(name = "Name")
     private String name;
 
+    @Column(name = "Email")
+    private String email;
+
     @NotEmpty
     @Column(name = "Latitude", nullable = false)
     private Double latitude;
@@ -41,7 +44,7 @@ public class Bike implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
 
         Bike bike = (Bike) o;
-        return id != null ? !id.equals(bike.id) : bike.id != null;
+        return id != null  ? !id.equals(bike.id) && email.equals(bike.email) : bike.id != null;
     }
 
     /**
@@ -57,6 +60,15 @@ public class Bike implements Serializable {
         temp = Double.doubleToLongBits(longitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /**

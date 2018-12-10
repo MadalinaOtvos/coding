@@ -2,6 +2,7 @@ package com.bike.rental.service;
 
 import com.bike.rental.model.Bike;
 import com.bike.rental.repository.BikeRepository;
+import com.bike.rental.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,8 @@ import java.util.List;
 public class BikeServiceImpl implements BikeService {
     @Autowired
     private BikeRepository bikeRepository;
-
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<Bike> findAllBikes() {
@@ -23,5 +25,20 @@ public class BikeServiceImpl implements BikeService {
     @Override
     public List<Bike> findAvailableBikes() {
         return bikeRepository.findByRentedFalse();
+    }
+
+    @Override
+    public Bike findBikeById(Long id) {
+        return bikeRepository.findBikeById(id);
+    }
+
+    @Override
+    public Bike updateRented(Long id, Boolean status, String name, String email) {
+        Bike bike = bikeRepository.findBikeById(id);
+        bike.setRented(status);
+        bike.setName(name);
+        bike.setEmail(email);
+        bikeRepository.save(bike);
+        return bike;
     }
 }

@@ -16,49 +16,60 @@ import java.util.List;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
-	
-	@Autowired
-	private UserRepository userRepository;
 
-	@Autowired
-	private BCryptPasswordEncoder bcryptEncoder;
+    @Autowired
+    private UserRepository userRepository;
 
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		User user = userRepository.findUserByEmail(email);
-		if(user == null){
-			throw new UsernameNotFoundException("Invalid username or password.");
-		}
-		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), getAuthority());
-	}
+    @Autowired
+    private BCryptPasswordEncoder bcryptEncoder;
 
-	private List<SimpleGrantedAuthority> getAuthority() {
-		return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-	}
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid username or password.");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), getAuthority());
+    }
 
-	public List<User> findAll() {
-		List<User> list = new ArrayList<>();
-		userRepository.findAll().iterator().forEachRemaining(list::add);
-		return list;
-	}
+    private List<SimpleGrantedAuthority> getAuthority() {
+        return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+    }
 
-	@Override
-	public void delete(Long id) {
-		userRepository.deleteById(id);
-	}
+    public List<User> findAll() {
+        List<User> list = new ArrayList<>();
+        userRepository.findAll().iterator().forEachRemaining(list::add);
+        return list;
+    }
 
-	@Override
-	public User findById(Long id) {
-		return userRepository.findById(id);
-	}
+    @Override
+    public void delete(Long id) {
+        userRepository.deleteById(id);
+    }
 
-	@Override
-	public User findByEmail(String email) {
-		return userRepository.findUserByEmail(email);
-	}
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id);
+    }
 
-	@Override
-	public User save(User user) {
-		user.setPassword(bcryptEncoder.encode(user.getPassword()));
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    @Override
+    public User save(User user) {
+        user.setPassword(bcryptEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public User updateRentedBike(User user) {
+        User userObj = userRepository.findUserByEmail(user.getEmail());
+        if (userObj.getRentedBikeId() == 0L && user.getRentedBikeId() != 0L) {
+            return userRepository.updateRentedBike(userObj.getEmail(), user.getRentedBikeId());
+        } else {
+            return userObj;
+        }
+
     }
 }
