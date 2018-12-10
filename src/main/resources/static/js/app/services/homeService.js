@@ -1,7 +1,7 @@
 (function () {
     'use strict';
     angular
-        .module('app')
+        .module('app',[])
         .factory('HomeService', ['$http','$q','API_URL',
             function ($http,$q, API_URL) {
 

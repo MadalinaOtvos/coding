@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('app', ['ui.router', 'ngCookies'])
+        .module('app', ['ui.router', 'ngCookies','leaflet-directive'])
         .config(config)
 
     config.$inject = ['$stateProvider','$urlRouterProvider','$locationProvider'];
@@ -25,7 +25,7 @@
             .state('register', {
                 url:  '/register',
                 controller: 'RegisterController',
-                templateUrl: 'partials/register.html',
+                templateUrl: 'partials/register.ftl',
                 controllerAs: 'vm'
             })
 

@@ -1,12 +1,11 @@
-(function () {
     'use strict';
 
     angular
-        .module('app')
+        .module('app',[])
         .controller('RegisterController', RegisterController);
 
-    RegisterController.$inject = ['LoginService', '$rootScope'];
-    function RegisterController(LoginService, $rootScope) {
+    RegisterController.$inject = ['$rootScope','RegistrationService'];
+    function RegisterController($rootScope,RegistrationService) {
 
         var self = this;
 
@@ -21,4 +20,3 @@
 
         }
     }
-})();

@@ -1,15 +1,17 @@
 (function () {
     'use strict';
     angular
-        .module('app')
-        .factory('RegistrationService', ['$http','$q','API_URL',
-         function ($http,$q, API_URL) {
+        .module('app',[])
+        .factory('RegistrationService', RegistrationService);
+        RegistrationService.$inject = ['$http','$q','API_URL'];
 
-            var factory = {
+         function RegistrationService($http,$q, API_URL) {
+
+            var service = {
                 register: register
             };
 
-            return factory;
+            return service;
 
             function register(user) {
                 console.log('Trying to register user...');
@@ -27,5 +29,5 @@
                     );
                 return deferred.promise;
             }
-        }]);
+        }
 }());
