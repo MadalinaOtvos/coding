@@ -18,7 +18,7 @@ public class Bike implements Serializable {
     @Column(name = "Name")
     private String name;
 
-    @Column(name = "Email")
+    @Column(name = "Email", nullable = false)
     private String email;
 
     @NotEmpty
