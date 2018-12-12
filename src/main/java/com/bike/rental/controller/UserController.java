@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -44,14 +46,18 @@ public class UserController {
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getOne(@PathVariable Long id) {
-        User user = userService.findById(id);
-        if (user == null) {
-            return new ResponseEntity<>(user, HttpStatus.NO_CONTENT);
+    @RequestMapping(value = "/details", method = RequestMethod.GET)
+    public ResponseEntity<User> getUser(Authentication authentication) {
+        String email = authentication.getName();
+        User userObj = userService.findByEmail(email);
+        if (userObj == null) {
+            logger.warn("User {} doesn't exist!", email);
+            return new ResponseEntity<>(userObj, HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        logger.info("User {} found!", userObj);
+        return new ResponseEntity<>(userObj, HttpStatus.OK);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
