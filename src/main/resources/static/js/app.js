@@ -1,10 +1,7 @@
 (function () {
     'use strict';
 
-    angular
-        .module('app', ['ui.router', 'ngCookies','leaflet-directive'])
-        .config(config)
-
+    angular.module('bikeRental', ['ui.router']).config(config).constant({API_URL:"http://localhost:8080/BikeRental/api"});
     config.$inject = ['$stateProvider','$urlRouterProvider','$locationProvider'];
     function config($stateProvider,$urlRouterProvider,$locationProvider) {
         $stateProvider
