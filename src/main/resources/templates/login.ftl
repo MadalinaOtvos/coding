@@ -7,12 +7,12 @@
                  &nbsp
                 <h3>Login</h3>
                 &nbsp
-                <form name="form" ng-submit="vm.login()" role="form">
+                <form name="form" ng-submit="vm.submit()" role="form">
                     <div class="row">
                     <div class="form-group col-md-12">
                         <label class="control-label col-md-3" for="email">Email:</label>
                         <div class="col-md-9">
-                        <input type="text" name="email" id="email" class="form-control" ng-model="vm.email" required />
+                        <input type="text" name="email" id="email" class="form-control" ng-model="vm.user.email" required />
                         </div>
                     </div>
                     </div>
@@ -21,7 +21,7 @@
                     <div class="form-group col-md-12">
                         <label class="control-label col-md-3" for="password">Password:</label>
                         <div class="col-md-9">
-                        <input type="password" name="password" id="password" class="form-control" ng-model="vm.password" required />
+                        <input type="password" name="password" id="password" class="form-control" ng-model="vm.user.password" required />
                         </div>
                     </div>
                     </div>
