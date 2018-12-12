@@ -1,12 +1,32 @@
 (function () {
     'use strict';
 
-    angular.module('bikeRental').service('LoginService',LoginService);
-    function LoginService(){
-        var login = this;
+    angular.module('bikeRental').service('LoginService', LoginService);
+    LoginService.$inject = ['$http', '$q', 'API_URL'];
 
-        login.submit = function(){
-            console.log("akarmi");
+    function LoginService($http, $q, API_URL) {
+        var service = {
+            login: login
+        };
+        return service;
+
+        function login(user) {
+            console.log('Trying to log in user: ' + user);
+            var deferred = $q.defer();
+            $http.post(API_URL + "/token", user)
+                .then(
+                    function (response) {
+                        console.log("User logged " + response.data.username + " in successfully!");
+                        $http.defaults.headers.common.Authorization = 'Bearer ' + response.data.token;
+                        deferred.resolve(response);
+                    },
+                    function (errResponse) {
+                        console.error('Error while login in user : ' + user.email + "\n Details: " + errResponse.data);
+                        deferred.reject(errResponse);
+                    }
+                );
+            return deferred.promise;
         }
+
     }
 }());
