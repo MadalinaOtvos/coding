@@ -2,6 +2,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <span class="lead">Bike Rental</span></div>
+             <div ng-class="{ 'alert': flash, 'alert-success': flash.type === 'success', 'alert-danger': flash.type === 'error' }" ng-if="flash" ng-bind="flash.message"></div>
              <div class="panel-body">
                  &nbsp
                 <h3>Login</h3>

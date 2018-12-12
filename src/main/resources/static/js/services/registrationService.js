@@ -1,7 +1,7 @@
 (function () {
     'use strict';
     angular
-        .module('app',[])
+        .module('bikeRental')
         .factory('RegistrationService', RegistrationService);
         RegistrationService.$inject = ['$http','$q','API_URL'];
 
@@ -14,9 +14,9 @@
             return service;
 
             function register(user) {
-                console.log('Trying to register user...');
+                console.log('Trying to register user ' + user);
                 var deferred = $q.defer();
-                $http.post(API_URL + "/user/", user)
+                $http.post(API_URL + "/users/register", user)
                     .then(
                         function (response) {
                             console.log("User successfully created!");
