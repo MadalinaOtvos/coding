@@ -1,10 +1,27 @@
-<span class="lead">Bike Rental</span></div>
+<div class="generic-container">
+    <div class="panel panel-default">
+        <div class="panel-heading" data-ng-init="vm.init()">
+            <span class="lead">Bike Rental</span></div>
         <div class="panel-body">
-            <h1>Hi {{vm.user.username}}!</h1>
-            <p>You're logged in!!</p>
-            <p>&nbsp;</p>
-            <p><a ui-sref="login" class="btn btn-primary">Logout</a></p>
-         </div>
-</div>
+            &nbsp
+            <h5>Welcome {{vm.user.name}} ! Select your desired bike!</h5>
+            &nbsp
 
-<div> <leaflet lf-center="center" markers="markers" width="100%" height="480px"></leaflet>
+            <form name="form" ng-submit="vm.logout()" role="form">
+                <div class="row">
+                    <div class="form-group col-md-12" id="map"></div>
+                </div>
+                &nbsp
+                <div class="row">
+                    <div>
+                        <button type="button" class="btn btn-primary">Logout</button>
+                    </div>
+                    &nbsp;
+                    <div>
+                        <button type="button" class="btn btn-danger">Delete account</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
