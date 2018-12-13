@@ -6,8 +6,7 @@ LoginController.$inject = ['$location', '$http', 'LoginService', 'NotificationSe
 function LoginController($location, $http, LoginService, NotificationService) {
 
     var vm = {
-        submit: submit,
-        logout: logout
+        submit: submit
     }
     return vm;
 
@@ -18,28 +17,19 @@ function LoginController($location, $http, LoginService, NotificationService) {
     function submit() {
         console.log('Submitting user log in: ' + vm.user.email);
         LoginService.login(vm.user).then(function (response) {
-                $location.url("/home");
-            }).catch(function (error) {
+            $location.url("/home");
+        }).catch(function (error) {
             console.log("Error while login in user: " + vm.user.email + "\n Details: " + error.status + "\n" + error.data);
 
-            if (error.status == 420) {
-                NotificationService.Error("Couldn't log in, wrong username or password! Please try again!", false);
+            if (error.status === 401) {
+                NotificationService.Error("Wrong username password combination! Make sure you already registered!", false);
             } else {
-                NotificationService.Error("Couldn't log in, something went wrong on server side! Please try again!", false);
+                if (error.status === 500) {
+                    NotificationService.Error("Make sure you are registered!", false);
+                } else {
+                    NotificationService.Error("Couldn't log in, something went wrong on server side! Please try again!", false);
+                }
             }
         });
-    }
-
-    function logout() {
-        console.log('Submitting user log out...');
-        LoginService.logout(self.user)
-            .then(function (response) {
-                $http.defaults.headers.common.Authorization = "";
-                $location.url("/");
-            }).catch(function (error) {
-            console.log("Error while login out user: " + vm.user.email + "\n Details: " + error);
-            NotificationService.Error("Error occurred while logging out! Please try again!", false);
-        });
-
     }
 }
