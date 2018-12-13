@@ -1,88 +1,194 @@
-var currentBikeId;
-var rentedBikeId = 2;
-var markerAvailableBikeButtonHtml = "<button type='button' class='btn btn-primary' onclick='rentBike()'>Rent Bike</button>";
-var returnBikeButtonHtml = "<button type='button' class='btn btn-primary' onclick='returnBike()'>Return Bicycle</button>"
-var markerBikeInstructions = "<ol><li>Click on 'Rent Bicycle'</li><li>Bicycle lock will unlock automatically</li><li>Adjust saddle height</li>&nbsp;;";
-
 'use strict';
+var markedBike = null;
+var user;
+var hasUserRentedBike = false;
+var authKey = "";
 
 angular
     .module('bikeRental')
     .controller('HomeController', HomeController);
 
-HomeController.$inject = ['$scope','$location', 'LoginService', 'UserService', 'HomeService', 'NotificationService'];
+HomeController.$inject = ['$scope', '$location', 'LoginService', 'UserService', 'HomeService', 'NotificationService', 'RegistrationService'];
 
-function HomeController($scope, $location, LoginService, UserService, HomeService, NotificationService) {
-    var vm = this;
+function HomeController($scope, $location, LoginService, UserService, HomeService, NotificationService, RegistrationService) {
+    var vm = {
+        init: init,
+        initMap: initMap,
+        submit: submit,
+        removeAccount: removeAccount
+    }
+    return vm;
 
-    vm.init = function () {
-
-        var isLoggedIn = UserService.isUserLogedIn();
-        // if (!isLoggedIn) {
-        //     $location.url("/");
-        //     NotificationService.Error("Please log in first!", true);
-        // } else {
-         HomeService.getBicycles().then(function (response) {
-             vm.bicycles = response.data;
-             console.log(vm.bicycles);
-         }).catch(function (error) {
-             console.log(error.data);
-         });
-
-        // UserService.getUserDetails().then(function (response) {
-        //     vm.user = response.data;
-        // }).catch(function (error) {
-        //     console.log(error);
-        // });
-
-        initMap();
-        //  }
-
+    function removeAccount() {
+        RegistrationService.removeAccount(user.id).then(function (response) {
+            $location.url("/");
+            hasUserRentedBike = false;
+            NotificationService.Success("Account removed successfully! Logged out automatically!", true);
+        }).catch(function (error) {
+            console.log("Couldn't remove account! Error: " + error.status + error.data);
+        });
     }
 
-    function initMap(){
-        var map = new L.Map('map').locate({setView: true, maxZoom: 8});
-        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-            maxZoom: 18
-        }).addTo(map);
-        map.attributionControl.setPrefix('');
-
-        var markers = [
-            [-0.1244324, 51.5006728, "<button type='button' class='btn btn-primary' onclick='rentBike()'>Rent Bike</button>", true],
-            [-0.119623, 51.503308, "<button type='button' class='btn btn-primary' onclick='rentBike()'>Rent Bike</button>", false],
-            [-0.1279688, 51.5077286, "<button type='button' class='btn btn-primary' onclick='rentBike()'>Rent Bike</button>", true]
-        ];
-
-        for (var i = 0; i < markers.length; i++) {
-
-            var lon = markers[i][0];
-            var lat = markers[i][1];
-            var popupText = markers[i][2];
-            var rented = markers[i][3];
-            var statusIcon = new L.icon({
-                iconUrl: rented === true ? 'https://cdn4.iconfinder.com/data/icons/miu/24/map-location-pin-map-marker-glyph-128.png'
-                    : 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-128.png',
-                iconSize: [25, 45],
-            })
-            var markerLocation = new L.LatLng(lat, lon);
-            var marker = new L.Marker(markerLocation, {bikeId: i, isRented: rented, icon: statusIcon});
-            map.addLayer(marker);
-            marker.bindPopup(popupText);
-            marker.on('click', onMarkerClick);
+    function init() {
+        authKey = UserService.getUserLoggedInAuthKey();
+        if (authKey === undefined) {
+            $location.url("/");
+            NotificationService.Error("Please log in first!", true);
+        } else {
+            UserService.getUserDetails().then(function (response) {
+                vm.user = response.data;
+                user = vm.user;
+                initMap();
+            }).catch(function (error) {
+                console.log(error);
+            });
         }
     }
 
-    var onMarkerClick = function (e) {
-        currentBikeId = this.options.bikeId
+    function initMap() {
+        HomeService.getBicycles().then(function (response) {
+            vm.bicycles = response.data;
+
+            var map = new L.Map('map').locate({setView: true, maxZoom: 16});
+            L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+                maxZoom: 18
+            }).addTo(map);
+            map.attributionControl.setPrefix('');
+
+            for (var i = 0; i < vm.bicycles.length; i++) {
+                var bike = vm.bicycles[i];
+                var popupContent = getMarkerContent(bike);
+                var statusIcon = new L.icon({
+                    iconUrl: bike.rented === true ? 'https://cdn4.iconfinder.com/data/icons/miu/24/map-location-pin-map-marker-glyph-128.png'
+                        : 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-128.png',
+                    iconSize: [25, 45],
+                });
+
+                var markerLocation = new L.LatLng(bike.latitude, bike.longitude);
+                var marker = new L.Marker(markerLocation, {
+                    icon: statusIcon,
+                    bike: bike
+                });
+                if (vm.bicycles[i].email === user.email) {
+                    markedBike = marker;
+                    hasUserRentedBike = true;
+                }
+
+                map.addLayer(marker);
+                marker.bindPopup(popupContent);
+                marker.on('click', onMarkerClick);
+            }
+        }).catch(function (error) {
+            console.log(error.data);
+        })
+
+    }
+
+    function onMarkerClick(e) {
+        markedBike = this;
+    }
+
+    function getMarkerContent(bike) {
+        var content = "<div align='center' class='inline'><i class='fa fa-bicycle fa-2x'></i><p>" + bike.name + "</p></div>";
+        var markerBikeInstructions = "<ol><li>Click on 'Rent Bicycle'</li><li>Bicycle lock will unlock automatically</li><li>Adjust saddle height</li>&nbsp;</ol>";
+        var rentAvailableBikeButtonHtml = "<div align='center'><button type='button' class='btn btn-primary' onclick='rentBike()'>Rent Bike</button></div>&nbsp;";
+        var returnBikeButtonHtml = "<div align='center'></div><button type='button' class='btn btn-primary' onclick='returnBike()'>Return Bicycle</button>&nbsp;</div>"
+
+        if (!bike.rented) {
+            content = content.concat(markerBikeInstructions).concat(rentAvailableBikeButtonHtml);
+        } else {
+            if (bike.email === user.email) {
+                content = content.concat(returnBikeButtonHtml);
+            } else {
+                content = content.concat("<div>Bike will be available soon!</div>");
+            }
+        }
+        return content;
+    }
+
+    function submit() {
+        console.log('Submitting user log out...');
+        LoginService.logout();
+        $location.url("/");
     }
 }
 
 
 function rentBike() {
-    alert("Hi current selected bike id: " + currentBikeId);
+    if (!hasUserRentedBike) {
+        user.rentedBikeId = markedBike.options.bike.id;
+        rentBikeHttpReqAndMarkerUpdate(user);
+    } else {
+        alert("You already rented a bicycle! Please park it down and rent a new one later!");
+    }
 }
 
 function returnBike() {
-    alert("Hi you returned bike: " + currentBikeId);
+    if (markedBike != null && hasUserRentedBike) {
+        user.rentedBikeId = markedBike.options.bike.id;
+        returnBikeHttpReqAndMarkerUpdate(user);
+    }
+}
+
+function rentBikeHttpReqAndMarkerUpdate(user) {
+    if (!hasUserRentedBike) {
+        var xhr = new XMLHttpRequest();
+        var url = "http://localhost:8080/BikeRental/api/bikes/rent";
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", authKey);
+        xhr.send(JSON.stringify(user));
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 2 && xhr.status === 200) {
+                console.log("User " + user.email + " has rented bicycle number : " + user.rentedBikeId);
+                hasUserRentedBike = true;
+                var statusIcon = new L.icon({
+                    iconUrl: 'https://cdn4.iconfinder.com/data/icons/miu/24/map-location-pin-map-marker-glyph-128.png',
+                    iconSize: [25, 45],
+                });
+                markedBike.setIcon(statusIcon);
+                var content = "<div align='center' class='inline'><i class='fa fa-bicycle fa-2x'></i><p>" + markedBike.options.bike.name + "</p></div>";
+                content = content.concat("<div>You rent this bike!</div>&nbsp;");
+                content = content.concat("<div align='center'></div><button type='button' class='btn btn-primary' onclick='returnBike()'>Return Bicycle</button>&nbsp;</div>");
+                markedBike.getPopup().setContent(content);
+                markedBike.getPopup().update();
+                var statusIcon = new L.icon({
+                    iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-128.png',
+                    iconSize: [25, 45],
+                });
+                markedBike.setIcon(statusIcon);
+            }
+        }
+    }
+}
+
+function returnBikeHttpReqAndMarkerUpdate(user) {
+    if (user.rentedBikeId > -1) {
+        var xhr = new XMLHttpRequest();
+        var url = "http://localhost:8080/BikeRental/api/bikes/leave";
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", authKey);
+        xhr.send(JSON.stringify(user));
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 2 && xhr.status === 200) {
+                console.log("User " + user.email + " has returned bicycle number : " + user.rentedBikeId);
+                user.rentedBikeId = -1;
+                hasUserRentedBike = false;
+                var statusIcon = new L.icon({
+                    iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-128.png',
+                    iconSize: [25, 45],
+                });
+                markedBike.setIcon(statusIcon);
+                var content = "<div align='center' class='inline'><i class='fa fa-bicycle fa-2x'></i><p>" + markedBike.options.bike.name + "</p></div>";
+                var markerBikeInstructions = "<ol><li>Click on 'Rent Bicycle'</li><li>Bicycle lock will unlock automatically</li><li>Adjust saddle height</li>&nbsp;</ol>";
+                var rentAvailableBikeButtonHtml = "<div align='center'><button type='button' class='btn btn-primary' onclick='rentBike()'>Rent Bike</button></div>&nbsp;";
+
+                content = content.concat(markerBikeInstructions).concat(rentAvailableBikeButtonHtml);
+                markedBike.getPopup().setContent(content);
+                markedBike.getPopup().update();
+            }
+        }
+    }
 }
