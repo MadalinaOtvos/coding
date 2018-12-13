@@ -6,7 +6,8 @@
 
     function UserService($http, $q, API_URL) {
         var service = {
-            getUserDetails: getUserDetails
+            getUserDetails: getUserDetails,
+            getUserLoggedInAuthKey: getUserLoggedInAuthKey
         };
         return service;
 
@@ -26,6 +27,10 @@
                 }
             );
             return deferred.promise;
+        }
+
+        function getUserLoggedInAuthKey() {
+            return $http.defaults.headers.common.Authorization;
         }
     }
 }());
