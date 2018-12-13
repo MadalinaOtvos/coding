@@ -1,6 +1,6 @@
-<div class="generic-container">
+<div class="generic-container"  data-ng-init="vm.init()">
     <div class="panel panel-default">
-        <div class="panel-heading" data-ng-init="vm.init()">
+        <div class="panel-heading">
             <span class="lead">Bike Rental</span></div>
         <div class="panel-body">
             &nbsp
