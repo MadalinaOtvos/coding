@@ -31,10 +31,10 @@ public class BikeServiceImpl implements BikeService {
     }
 
     @Override
-    public Bike updateRented(Long id, Boolean status, String name, String email) {
+    public Bike updateRented(Long id, Boolean status, String email) {
         Bike bike = bikeRepository.findBikeById(id);
         if (bike != null) {
-            bikeRepository.updateRentedBike(id, status, name, email);
+            bikeRepository.updateRentedBike(id, status, email);
             return bikeRepository.findBikeById(id);
         } else {
             return null;

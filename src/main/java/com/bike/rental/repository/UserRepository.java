@@ -14,12 +14,12 @@ import javax.transaction.Transactional;
 @Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByEmail(String email);
-
-    User deleteById(Long id);
-
     User findById(Long id);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.rentedBikeId = :rentedBikeId WHERE u.email = :email")
     int updateUserRentedBike(@Param("email") String email, @Param("rentedBikeId") Long rentedBikeId);
+
+    void deleteById(Long id);
+
 }

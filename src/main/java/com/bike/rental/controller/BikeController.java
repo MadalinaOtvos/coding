@@ -69,7 +69,7 @@ public class BikeController {
      */
     @RequestMapping(value = "/bikes/rent", method = RequestMethod.POST)
     public ResponseEntity<Bike> updateBike(@RequestBody User user) {
-        Bike bike = bikeService.updateRented(user.getRentedBikeId(), true, user.getName(), user.getEmail());
+        Bike bike = bikeService.updateRented(user.getRentedBikeId(), true, user.getEmail());
         if (bike == null) {
             return new ResponseEntity<>(bike, HttpStatus.CONFLICT);
         } else {
@@ -89,10 +89,10 @@ public class BikeController {
         Bike bike = bikeService.findBikeById(user.getRentedBikeId());
 
         if (bike == null) {
-            return new ResponseEntity<>(bike, HttpStatus.CONFLICT);
+            return new ResponseEntity<>(bike, HttpStatus.NOT_FOUND);
         } else {
-            bike = bikeService.updateRented(user.getRentedBikeId(), false, "Bike", "");
-            user.setRentedBikeId(0L);
+            bike = bikeService.updateRented(user.getRentedBikeId(), false, "");
+            user.setRentedBikeId(-1L);
             userService.updateRentedBike(user);
             logger.info("Bike id {} left by user: {}.", user.getRentedBikeId(), user.getEmail());
             return new ResponseEntity<>(bike, HttpStatus.OK);

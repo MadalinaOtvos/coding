@@ -1,6 +1,8 @@
 package com.bike.rental.controller;
 
+import com.bike.rental.model.Bike;
 import com.bike.rental.model.User;
+import com.bike.rental.service.BikeService;
 import com.bike.rental.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private BikeService bikeService;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<User> saveUser(@RequestBody User user) {
@@ -30,7 +34,7 @@ public class UserController {
             return new ResponseEntity<>(userObj, HttpStatus.CONFLICT);
         }
 
-        user.setRentedBikeId(0L);
+        user.setRentedBikeId(-1L);
         userObj = userService.save(user);
         logger.info("User {} successfully registered.", user.getEmail());
         return new ResponseEntity<>(userObj, HttpStatus.OK);
@@ -60,13 +64,15 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
         User user = userService.findById(id);
         if (user == null) {
-            return new ResponseEntity<>(String.format("User with id {} doesn't exist!", id), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(String.format("User with id {} doesn't exist!", id), HttpStatus.NOT_FOUND);
         }
-
-        userService.delete(id);
+        if (user.getRentedBikeId() > -1L) {
+            bikeService.updateRented(user.getRentedBikeId(), false, "");
+        }
+        userService.deleteById(id.longValue());
         return new ResponseEntity<>(String.format("User with id {} removed successfully.", id), HttpStatus.OK);
     }
 

@@ -16,7 +16,8 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
     List<Bike> findByRentedFalse();
 
     Bike findBikeById(Long id);
+
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Bike b SET  b.name= :name, b.email= :email, b.rented = :status WHERE b.id = :id")
-    int updateRentedBike(@Param("id") Long id, @Param("status") Boolean status, @Param("name") String name, @Param("email") String email);
+    @Query("UPDATE Bike b SET  b.email= :email, b.rented = :status WHERE b.id = :id")
+    int updateRentedBike(@Param("id") Long id, @Param("status") Boolean status, @Param("email") String email);
 }
