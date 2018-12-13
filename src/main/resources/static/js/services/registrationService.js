@@ -8,8 +8,8 @@
     function RegistrationService($http, $q, API_URL) {
 
         var service = {
-           register: register,
-           unregister: unregister
+            register: register,
+            removeAccount: removeAccount
         };
 
         return service;
@@ -31,17 +31,17 @@
             return deferred.promise;
         }
 
-        function unregister(user) {
-            console.log('Trying to deregister user ' + user);
+        function removeAccount(userId) {
             var deferred = $q.defer();
-            $http.delete(API_URL + "/users/" + user.id)
+            $http.delete(API_URL.concat("/users/") + userId)
                 .then(
                     function (response) {
-                        console.log("User unregistered successfully!");
-                        deferred.resolve(response);
+                        console.log('Account id: ' + userId + " removed successfully!");
+                        $http.defaults.headers.common.Authorization = "";
+                        deferred.resolve(response.data);
                     },
                     function (errResponse) {
-                        console.error('Error while creating entry : ' + user.email + "\n Details: " + errResponse.data);
+                        console.error('Error while removing entry with id :' + userId);
                         deferred.reject(errResponse);
                     }
                 );
