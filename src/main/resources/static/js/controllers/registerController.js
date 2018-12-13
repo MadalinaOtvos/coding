@@ -21,7 +21,6 @@ function RegisterController($rootScope, $location, RegistrationService, Notifica
         console.log('Submitting registration...');
         RegistrationService.register(vm.user)
             .then(function (response) {
-                console.log(response.data);
                 $location.url("/");
                 NotificationService.Success("Registration successful! Please log in!", true);
             }).catch(function (error) {
