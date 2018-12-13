@@ -143,21 +143,19 @@ function rentBikeHttpReqAndMarkerUpdate(user) {
             if (xhr.readyState === 2 && xhr.status === 200) {
                 console.log("User " + user.email + " has rented bicycle number : " + user.rentedBikeId);
                 hasUserRentedBike = true;
-                var statusIcon = new L.icon({
+
+                var status = new L.icon({
                     iconUrl: 'https://cdn4.iconfinder.com/data/icons/miu/24/map-location-pin-map-marker-glyph-128.png',
-                    iconSize: [25, 45],
+                    iconSize: [25, 45]
                 });
-                markedBike.setIcon(statusIcon);
+                markedBike.setIcon(status);
+
                 var content = "<div align='center' class='inline'><i class='fa fa-bicycle fa-2x'></i><p>" + markedBike.options.bike.name + "</p></div>";
                 content = content.concat("<div>You rent this bike!</div>&nbsp;");
                 content = content.concat("<div align='center'></div><button type='button' class='btn btn-primary' onclick='returnBike()'>Return Bicycle</button>&nbsp;</div>");
                 markedBike.getPopup().setContent(content);
                 markedBike.getPopup().update();
-                var statusIcon = new L.icon({
-                    iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-128.png',
-                    iconSize: [25, 45],
-                });
-                markedBike.setIcon(statusIcon);
+
             }
         }
     }
