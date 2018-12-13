@@ -2,11 +2,12 @@
     'use strict';
 
     angular.module('bikeRental').service('LoginService', LoginService);
-    LoginService.$inject = ['$http', '$q', 'API_URL'];
+    LoginService.$inject = ['$http','$q', 'API_URL'];
 
     function LoginService($http, $q, API_URL) {
         var service = {
-            login: login
+            login: login,
+            logout: logout
         };
         return service;
 
@@ -27,6 +28,10 @@
                 );
             return deferred.promise;
         }
-
+        function logout() {
+            $http.defaults.headers.common.Authorization = "";
+        }
     }
+
+
 }());
