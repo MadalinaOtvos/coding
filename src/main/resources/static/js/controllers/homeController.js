@@ -22,7 +22,10 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
     function removeAccount() {
         RegistrationService.removeAccount(user.id).then(function (response) {
             $location.url("/");
+            markedBike = null;
+            user;
             hasUserRentedBike = false;
+            authKey = "";
             NotificationService.Success("Account removed successfully! Logged out automatically!", true);
         }).catch(function (error) {
             console.log("Couldn't remove account! Error: " + error.status + error.data);
@@ -111,6 +114,10 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
         console.log('Submitting user log out...');
         LoginService.logout();
         $location.url("/");
+        markedBike = null;
+        user;
+        hasUserRentedBike = false;
+        authKey = "";
     }
 }
 
