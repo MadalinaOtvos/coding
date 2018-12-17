@@ -30,6 +30,7 @@
         }
 
         function getUserLoggedInAuthKey() {
+          //  console.log($http.defaults.headers.common.Authorization);
             return $http.defaults.headers.common.Authorization;
         }
     }

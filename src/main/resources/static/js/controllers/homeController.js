@@ -22,10 +22,7 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
     function removeAccount() {
         RegistrationService.removeAccount(user.id).then(function (response) {
             $location.url("/");
-            markedBike = null;
-            user = {};
-            hasUserRentedBike = false;
-            authKey = "";
+            initGlobals();
             NotificationService.Success("Account removed successfully! Logged out automatically!", true);
         }).catch(function (error) {
             console.log("Couldn't remove account! Error: " + error.status + error.data);
@@ -34,7 +31,7 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
 
     function init() {
         authKey = UserService.getUserLoggedInAuthKey();
-        if (authKey === undefined) {
+        if (authKey === undefined || authKey === "") {
             $location.url("/");
             NotificationService.Error("Please log in first!", true);
         } else {
@@ -43,6 +40,9 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
                 user = vm.user;
                 initMap();
             }).catch(function (error) {
+                if (error.status === 401) {
+                    NotificationService.Error("Your session has expired. Please log in first!", true);
+                }
                 console.log(error);
             });
         }
@@ -88,8 +88,24 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
 
     }
 
+    function initGlobals() {
+        markedBike = null;
+        user = {};
+        hasUserRentedBike = false;
+        authKey = "";
+    }
+
     function onMarkerClick(e) {
         markedBike = this;
+        UserService.getUserDetails().then(function (response) {
+        }).catch(function (error) {
+            if (error.status === 401) {
+                NotificationService.Error("Your session has expired. Please log in first!", true);
+                LoginService.logout();
+                $location.url("/");
+                initGlobals();
+            }
+        });
     }
 
     function getMarkerContent(bike) {
@@ -114,10 +130,7 @@ function HomeController($scope, $location, LoginService, UserService, HomeServic
         console.log('Submitting user log out...');
         LoginService.logout();
         $location.url("/");
-        markedBike = null;
-        user = {};
-        hasUserRentedBike = false;
-        authKey = "";
+        initGlobals();
     }
 }
 
