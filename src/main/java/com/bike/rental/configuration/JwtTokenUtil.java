@@ -53,7 +53,7 @@ public class JwtTokenUtil implements Serializable {
 
         Claims claims = Jwts.claims().setSubject(subject);
         claims.put("scopes", Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        Date tokenValidity = new Date(System.currentTimeMillis() +  Long.parseLong(environment.getRequiredProperty("ACCESS_TOKEN_VALIDITY_SECONDS")));
+        Date tokenValidity = new Date(System.currentTimeMillis() +  Long.parseLong(environment.getRequiredProperty("ACCESS_TOKEN_VALIDITY_MILLISECONDS")));
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
