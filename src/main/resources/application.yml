@@ -1,4 +1,4 @@
-ACCESS_TOKEN_VALIDITY_MILLISECONDS: 60000 #1 min expiring time for token
+ACCESS_TOKEN_VALIDITY_MILLISECONDS: 6000000 #x mili secs for theexpiring time for token
 SIGNING_KEY: "ojid46FKJf55JFPw556wWkoeijhedTjid7D555D"
 TOKEN_PREFIX: "Bearer "
 HEADER_STRING: "Authorization"
