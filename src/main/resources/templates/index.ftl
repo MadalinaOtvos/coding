@@ -12,9 +12,7 @@
     <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
             integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
             crossorigin=""></script>
-    <script data-require="angular.js@1.5.x" src="https://code.angularjs.org/1.5.8/angular.js"
-            data-semver="1.5.8"></script>
-
+    <script src="//code.angularjs.org/1.2.20/angular.js"></script>
     <script src="//unpkg.com/@uirouter/angularjs/release/angular-ui-router.min.js"></script>
     <script src="js/app.js"></script>
 
