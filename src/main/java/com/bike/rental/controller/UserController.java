@@ -70,7 +70,7 @@ public class UserController {
             bikeService.updateRented(user.getRentedBikeId(), false, "");
         }
         userService.deleteById(id.longValue());
-        return new ResponseEntity<>(String.format("User with id {} removed successfully.", id), HttpStatus.OK);
+        return new ResponseEntity<>(String.format("User with id %s removed successfully.", id), HttpStatus.OK);
     }
 
 
